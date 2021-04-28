@@ -1,0 +1,13 @@
+{
+  // "extends": "airbnb-base",
+  "extends": "default"
+  // "env": {
+  //   "browser": true,
+  //   "es6": true,
+  //   "worker": true
+  // },
+  // "parserOptions": {
+  //   "ecmaVersion": 10,
+  //   "sourceType": "script"
+  // }
+}
