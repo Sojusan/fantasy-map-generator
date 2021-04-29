@@ -1,5 +1,3 @@
-// import {Delaunay} from "d3-delaunay";
-
 // var svg = d3.selectAll("svg").filter(function (d, i) { return i === 0}),
 //     width = +svg.attr("width"),
 //     height = +svg.attr("height"),
@@ -252,7 +250,8 @@ let delaunay = d3.Delaunay.from( sites, d => d.x, d => d.y );
 // Takes the bounds of our diagram area as arguments [x0,y0,x1,y1]
 let voronoi = delaunay.voronoi([0, 0, width, height]);
 
-function voronoi_vertex(circumcenters) {
+function circumcenters_coords() {
+  let circumcenters = voronoi.circumcenters;
   let vertex_coords = [];
   for (let i = 0; i < circumcenters.length; i += 2) {
     vertex_coords.push({
@@ -264,59 +263,40 @@ function voronoi_vertex(circumcenters) {
   return vertex_coords;
 };
 
-svg.selectAll('path')
-  // Construct a data object from each cell of our voronoi diagram
-  .data( sites.map((_, i) => voronoi.renderCell(i)) )
-  .enter()
-  .append('path')
-        .attr('d', d => d)
-        .style('fill', (_,i) => 'grey')
-        .style('opacity', 1)
-        .style('stroke', 'white')
-        .style('stroke-opacity', 1);
+function voronoi_vertex() {
+  let vertex_coords = [];
+  for (let i = 0; i < sites.length; i++) {
 
-svg.selectAll('path')
-  // Construct a data object from each cell of our voronoi diagram
-  .enter()
-  .data( voronoi_vertex(voronoi.circumcenters).map( (_, i) => delaunay.renderTriangle(i) ) )
-  .enter()
-  .append('path')
-        .attr('d', d => d)
-        .style('fill', (_,i) => 'rgba(255, 255, 255, 0)')
-        .style('opacity', 1)
-        .style('stroke', 'black')
-        .style('stroke-opacity', 1);
+    let polygon = voronoi.cellPolygon(i);
+    polygon.forEach((item, index) => {
+      // console.log(item)
+      let is_unique = true;
+      for (let j = 0; j < vertex_coords.length; j++) {
+        if (item[0] === vertex_coords[j].x && item[1] === vertex_coords[j].y) {
+          is_unique = false;
+          break;
+        };
+      };
+      if (is_unique) {
+        vertex_coords.push({
+            x: item[0],
+            y: item[1]
+          });
+      };
+    });
+  };
 
-console.log( sites[1] );
-console.log( d3.polygonCentroid(voronoi.cellPolygon(1)) );
-console.log(voronoi)
-// console.log( sites );
-// console.log( voronoi.renderCell(1) );
-// console.log( voronoi.circumcenters );
-// console.log( voronoi_vertex(voronoi.circumcenters) )
-// console.log( voronoi.cellPolygon(1) );
-// console.log( delaunay.triangles );
+  return vertex_coords;
+};
 
+console.log( sites[0] );
+console.log( d3.polygonCentroid(voronoi.cellPolygon(0)) );
+console.log( voronoi.cellPolygon(0) );
+console.log( voronoi );
+console.log( circumcenters_coords() );
+console.log( voronoi_vertex() );
 
-svg.selectAll('circle')
-  .data( sites )
-  .enter()
-  .append('circle')
-  .attr('cx', d => d.x)
-  .attr('cy', d => d.y)
-  .attr('r', 3)
-  .style('fill', 'red');
-
-svg.selectAll('circle')
-  .enter()
-  .data( voronoi_vertex(voronoi.circumcenters) )
-  .enter()
-  .append('circle')
-  .attr('cx', d => d.x)
-  .attr('cy', d => d.y)
-  .attr('r', 3)
-  .style('fill', 'blue');
-
+draw_all();
 
 d3.select('#relax-button').on('click', relax);
 
@@ -324,35 +304,32 @@ d3.select('#relax-button').on('click', relax);
 // Adding relax function
 function relax() {
   // relaxation itself
+  // iterator increment
   iteration.value = +iteration.value + 1;
-  // sites = voronoi(sites).polygons().map(d3.polygonCentroid);
-  // for (let i = 0; i < sites.length; i++) {
-  //   const cell = voronoi.cellPolygon(i)
-  //   const
-  // };
+  // adjust every point
   sites.forEach((item, index) => {
+    // get the voronoi cell for point
     const cell = voronoi.cellPolygon(index);
+    // get the coordinates of centroid of the cell
     const [new_x, new_y] = d3.polygonCentroid(cell);
+    // set new point coordinates
     item.x = new_x;
     item.y = new_y;
-    // console.log(item, new_x, new_y);
-    // console.log(cell);
   });
 
-  console.log(sites[1]);
-
-  // delaunay = delaunay.update();
-  // voronoi.update();
+  // update delaunay and voronoi
   delaunay = d3.Delaunay.from( sites, d => d.x, d => d.y );
   voronoi = delaunay.voronoi([0, 0, width, height]);
-  // console.log(voronoi)
+  // draw updated diagrams
   draw_all();
 }
 
 function draw_all() {
+  // clear svg data
   svg.selectAll('path').remove();
   svg.selectAll('circle').remove();
 
+  // added voronoi edges
   svg.selectAll('path')
   // Construct a data object from each cell of our voronoi diagram
     .data( sites.map((_, i) => voronoi.renderCell(i)) )
@@ -364,10 +341,11 @@ function draw_all() {
       .style('stroke', 'white')
       .style('stroke-opacity', 1);
 
+  // added delaunay edges
   svg.selectAll('path')
   // Construct a data object from each cell of our voronoi diagram
     .enter()
-    .data( voronoi_vertex(voronoi.circumcenters).map( (_, i) => delaunay.renderTriangle(i) ) )
+    .data( circumcenters_coords().map( (_, i) => delaunay.renderTriangle(i) ) )
     .enter()
     .append('path')
       .attr('d', d => d)
@@ -376,6 +354,7 @@ function draw_all() {
       .style('stroke', 'black')
       .style('stroke-opacity', 1);
 
+  // added delaunay vertex
   svg.selectAll('circle')
     .data( sites )
     .enter()
@@ -385,9 +364,10 @@ function draw_all() {
     .attr('r', 3)
     .style('fill', 'red');
 
+  // added voronoi vertex
   svg.selectAll('circle')
     .enter()
-    .data( voronoi_vertex(voronoi.circumcenters) )
+    .data( voronoi_vertex() )
     .enter()
     .append('circle')
     .attr('cx', d => d.x)
