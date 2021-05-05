@@ -1,17 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>A JavaScript project</title>
+  <title>Fantasy Map Generator</title>
   <link rel="stylesheet" href="style.css">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
-  <h1>A JavaScript project</h1>
+  <h1>Fantasy Map Generator</h1>
   <div id="app"></div>
-  <div>
-    <svg width="2000" height="2000"></svg>
+
+  <h2>Delaunay and Voronoi diagram showcase</h2>
+  <button id="delaunay-voronoi-diagram-showcase-button">Hide/Show</button>
+  <div id="delaunay-voronoi-diagram-showcase-div" style="display:none">
+    <svg id="delaunay-voronoi-diagram-showcase-svg" width="2000" height="2000"></svg>
     <br><button id="relax-button">Relax</button>
     Iteration: <input id="iteration" value="0">
+  </div>
+
+  <h2>Basic island generator</h2>
+  <button id="basic-island-generator-button">Hide/Show</button>
+  <div id="basic-island-generator-div" style="display:block">
+    <svg id="basic-island-generator-svg" width="1000" height="600"></svg>
+    <br><button id="basic-island-generator-generate-button">Generate Graph!</button>
+    <button id="basic-island-generator-toggle-circles-button">Toggle circles</button>
+    Click to add blob.
+    Cell: <span id="basic-island-generator-cell">0</span>;
+    Height: <span id="basic-island-generator-height">0</span>;<br>
+    <label>Graph Size:</label>
+      <input id="basicIslandGeneratorSizeInput" value="100" type="range" min="100" max="10000" step="100" oninput="basicIslandGeneratorSizeOutput.value = basicIslandGeneratorSizeInput.valueAsNumber">
+      <output id="basicIslandGeneratorSizeOutput">100</output><br>
+    <label>Max Height:</label>
+      <input id="basicIslandGeneratorHeightInput" value="0.6" type="range" min="0.1" max="1" step="0.01" oninput="basicIslandGeneratorHeightOutput.value = basicIslandGeneratorHeightInput.valueAsNumber">
+      <output id="basicIslandGeneratorHeightOutput">0.6</output><br>
+    <label>Radius:</label>
+      <input id="basicIslandGeneratorRadiusInput" value="0.98" type="range" min="0.95" max="0.999" step="0.001" oninput="basicIslandGeneratorRadiusOutput.value = basicIslandGeneratorRadiusInput.valueAsNumber">
+      <output id="basicIslandGeneratorRadiusOutput">0.98</output><br>
+    <label>Sharpness:</label>
+    <input id="basicIslandGeneratorSharpnessInput" value="0.2" type="range" min="0" max="0.5" step="0.1" oninput="basicIslandGeneratorSharpnessOutput.value = basicIslandGeneratorSharpnessInput.valueAsNumber">
+    <output id="basicIslandGeneratorSharpnessOutput">0.2</output><br>
   </div>
   <!-- <div>
     <svg width="640" height="360"></svg>
