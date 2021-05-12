@@ -16,7 +16,7 @@ function showHide(elementId) {
 let svg = d3.select('#delaunay-voronoi-diagram-showcase-svg');
 let width = +svg.attr('width');
 let height = +svg.attr('height');
-let sites = d3.range(1000).map(function() {
+let sites = d3.range(100).map(function() {
     return {
       x: Math.random() * width,
       y: Math.random() * height
