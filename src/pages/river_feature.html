@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <title>Map Generator</title>
+        <link rel="stylesheet" href="../css/river_feature.css" />
+        <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+    </head>
+
+    <body>
+        <h1>Map Generator</h1>
+
+        <h2>River feature</h2>
+        <div>
+            <svg id="svg" width="800" height="600">
+                <defs>
+                    <filter id="blurFilter" x="-1" y="-1" width="100" height="100">
+                        <feGaussianBlur in="SourceGraphic" stdDeviation="0.5" />
+                    </filter>
+                    <mask id="shape">
+                        <rect x="0" y="0" width="100%" height="100%" fill="white" />
+                    </mask>
+                    <pattern id="shallowHatch" width="2" height="4" patternTransform="rotate(90 0 0)" patternUnits="userSpaceOnUse">
+                        <line x1="0" y1="0" x2="0" y2="4" style="stroke: black; stroke-width: 0.5; fill: black;" />
+                    </pattern>
+                </defs>
+            </svg>
+            <div>
+                <button id="lock_button" status="1" title="Editable/Locked map">Edit/Locked</button>
+                <button id="random_map_button">Random map</button>
+                <button id="clear_button">Clear</button>
+                <button onclick="$('#options').fadeToggle()">Options</button>
+                <button id="resetZoom">Reset zoom</button>
+                <span>Cell: <span id="cell">0</span>; Height: <span id="height">0</span>; <span id="feature">no</span>;</span> Flux: <span id="flux">no</span>; Precipitation: <span id="precipitation">no</span>; River: <span id="river">no</span>;
+            </div>
+            <div id="options" style="font-size: small;" hidden>
+                <div style="width: 50%; float: right;">
+                    <label>Map Style: </label>
+                    <select id="mapStyle">
+                        <option value="polygonal">Polygonal</option>
+                        <option value="flat" selected>Flat</option>
+                    </select><br>
+                    <label>Slope hatching
+                        <input id="hatchingInput" type="checkbox">
+                    </label><br>
+                    <label>Blur
+                        <input id="blurInput" type="checkbox">
+                    </label><br>
+                        <label>Voronoi polygons
+                            <input id="strokesInput" type="checkbox">
+                        </label><br>
+                    <label>Draw sea polygons
+                        <input id="seaInput" type="checkbox">
+                    </label><br>
+                        <label>Toggle flux map
+                            <input id="fluxInput" type="checkbox">
+                        </label><br>
+                    <label>Show blobs centers
+                        <input onclick="$('.circles').toggle()" type="checkbox">
+                    </label>
+                </div>
+                <div>
+                    <label>Points radius:</label>
+                    <input id="sizeInput" value="4" type="range" min="1" max="10" step="1" oninput="sizeOutput.value = sizeInput.valueAsNumber" title="Radius between points used for Poisson-disc sampling">
+                    <output id="sizeOutput" title="Radius between points used for Poisson-disc sampling">4</output>
+                    <br>
+                    <label>Max Height:</label>
+                    <input id="heightInput" value="0.9" type="range" min="0.1" max="1" step="0.01" oninput="heightOutput.value = heightInput.valueAsNumber">
+                    <output id="heightOutput">0.9</output>
+                    <br>
+                    <label>Blob Radius:</label>
+                    <input id="radiusInput" value="0.9" type="range" min="0.5" max="0.999" step="0.001" oninput="radiusOutput.value = radiusInput.valueAsNumber" title="Change gently!">
+                    <output id="radiusOutput" title="Change gently!">0.9</output>
+                    <br>
+                    <label>Blog Sharpness:</label>
+                    <input id="sharpnessInput" value="0.2" type="range" min="0" max="0.4" step="0.2" oninput="sharpnessOutput.value = sharpnessInput.valueAsNumber">
+                    <output id="sharpnessOutput">0.2</output>
+                    <br>
+                    <label>Prevailing winds: </label>
+                    <label>Random<input type="checkbox" id="randomWinds" checked></label>|
+                    <label>N<input type="checkbox" id="north"></label>|
+                    <label>E<input type="checkbox" id="east"></label>|
+                    <label>S<input type="checkbox" id="south"></label>|
+                    <label>W<input type="checkbox" id="west"></label><br>
+                    <label>Wave power:</label>
+                    <input id="wavepowerInput" value="0.5" type="range" min="0" max="1" step="0.01" oninput="wavepowerOutput.value = wavepowerInput.valueAsNumber">
+                    <output id="wavepowerOutput">0.5</output>
+                    <br>
+                    <label>Downcutting:</label>
+                    <input id="downCuttingInput" value="0.1" type="range" min="0" max="0.5" step="0.01" oninput="downCuttingOutput.value = downCuttingInput.valueAsNumber">
+                    <output id="downCuttingOutput">0.1</output>
+                    <br>
+                    <label>Precipitation:</label>
+                    <input id="precipitationInput" value="7" type="range" min="0" max="10" step="0.1" oninput="precipitationOutput.value = precipitationInput.valueAsNumber">
+                    <output id="precipitationOutput">7</output>
+                </div>
+            </div>
+        </div>
+
+        <script type="module" src="../js/river_feature.js"></script>
+        <script src="../../libs/d3.min.js"></script>
+        <script src="../../libs/jquery-3.6.0.min.js"></script>
+        <script src="../../libs/path-data-polyfill.js"></script>
+    </body>
+</html>

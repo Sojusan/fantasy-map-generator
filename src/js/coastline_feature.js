@@ -476,6 +476,7 @@ function generate(count) {
       $("#feature").text("no!");
     }
   };
+
   if (count != undefined) {
     randomMap(count);
   }
