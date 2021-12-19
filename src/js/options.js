@@ -58,3 +58,20 @@ $("#temperatureInput").change(() => {
         d3.selectAll(".temperature").remove();
     };
 });
+
+// Toggle temperature map
+$("#biomeInput").change(() => {
+    if (biomeInput.checked == true) {
+        polygons.map((polygon) => {
+            if (polygon.height >= 0.2) {
+                grid.append("path")
+                    .attr("d", "M" + polygon.join("L") + "Z")
+                    .attr("stroke", polygon.biome.color)
+                    .attr("fill", polygon.biome.color)
+                    .attr("class", "biome");
+            };
+        });
+    } else {
+        d3.selectAll(".biome").remove();
+    };
+});

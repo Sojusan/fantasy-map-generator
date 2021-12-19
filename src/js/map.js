@@ -1,14 +1,16 @@
 // Calculate map position on globe
 function calculateMapCoordinates() {
     const size = +document.getElementById("mapSizeOutput").value;
-    const latShift = +document.getElementById("latitudeOutput").value;
+    const latitudeShift = +document.getElementById("latitudeOutput").value;
 
-    const latT = roundNumber((size / 100) * 180, 1);
-    const latN = roundNumber(90 - ((180 - latT) * latShift) / 100, 1);
-    const latS = roundNumber(latN - latT, 1);
+    const latitudeT = roundNumber((size / 100) * 180, 1);
+    const latitudeN = roundNumber(90 - ((180 - latitudeT) * latitudeShift) / 100, 1);
+    const latitudeS = roundNumber(latitudeN - latitudeT, 1);
 
-    const lon = roundNumber(Math.min(((mapWidth / mapHeight) * latT) / 2, 180));
-    mapCoordinates = { latT, latN, latS, lonT: lon * 2, lonW: -lon, lonE: lon };
+    const longitude = roundNumber(Math.min(((mapWidth / mapHeight) * latitudeT) / 2, 180), 1);
+    mapCoordinates = {
+        latitudeT, latitudeN, latitudeS, longitudeT: longitude * 2, longitudeW: -longitude, longitudeE: longitude
+    };
 };
 
 // Temperature calculations
@@ -21,8 +23,8 @@ function calculateTemperature() {
 
     polygons.forEach(polygon => {
         const y = polygon.point.y;
-        const lat = Math.abs(mapCoordinates.latN - (y / mapHeight) * mapCoordinates.latT);  // [0; 90]
-        const initialTemperature = temperatureEquator - interpolation(lat / 90) * temperatureDelta;
+        const latitude = Math.abs(mapCoordinates.latitudeN - (y / mapHeight) * mapCoordinates.latitudeT);  // [0; 90]
+        const initialTemperature = temperatureEquator - interpolation(latitude / 90) * temperatureDelta;
         polygon.temperature = Math.min(Math.max(initialTemperature - convertToFriendly(polygon.height), -128), 127);
     });
 
@@ -317,6 +319,7 @@ function randomMap(count) {
     calculateMapCoordinates();
     calculateTemperature();
     calculatePrecipitation();
+    assignBiomes();
     resolveDepressions();
     downCutRivers();
     markFeatures();

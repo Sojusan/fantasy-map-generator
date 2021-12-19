@@ -7,9 +7,6 @@ function add(start, type) {
     let queue = [];  // polygons to check
     let used = [];  // used polygons
 
-    // console.log("start: ", start);
-    // console.log("type: ", type);
-
     polygons[start].height += height;
     polygons[start].featureType = undefined;
     queue.push(start);

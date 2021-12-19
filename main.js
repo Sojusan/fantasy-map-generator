@@ -26,6 +26,7 @@ document.getElementById("worldControls").addEventListener("input", e => {
     };
     calculateMapCoordinates();
     calculateTemperature();
+    assignBiomes();
 });
 
 // Add general elements
@@ -98,6 +99,7 @@ polygons.forEach((polygon, index) => {
     polygon.flux = 0.02;
     polygon.precipitation = 0.02;
     polygon.temperature = 0;
+    polygon.biome = null;
 });
 
 // General function
@@ -139,6 +141,11 @@ function moved(event) {
         $("#temperature").text(polygons[nearest].temperature);
       } else {
         $("#temperature").text("no!");
+      };
+    if (polygons[nearest].biome) {
+        $("#biome").text(polygons[nearest].biome.name);
+      } else {
+        $("#biome").text("no!");
       };
 
     if (lock_button.getAttribute("status") == 0) {

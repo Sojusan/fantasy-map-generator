@@ -11,8 +11,6 @@
 
 <body>
   <h1>Map Generator</h1>
-
-  <h2>River feature</h2>
   <div>
     <svg id="svg" width="800" height="600">
       <defs>
@@ -35,7 +33,7 @@
       <button id="resetZoom">Reset zoom</button>
       <span>Cell: <span id="cell">0</span>; Height: <span id="height">0</span>; <span id="feature">no</span>;</span>
       Flux: <span id="flux">no</span>; Precipitation: <span id="precipitation">no</span>; River: <span
-        id="river">no</span>; Temperature: <span id="temperature">no</span>;
+        id="river">no</span>; Temperature: <span id="temperature">no</span>; Biome: <span id="biome">no</span>;
     </div>
     <div id="options" style="font-size: small;" hidden>
       <div style="width: 50%; float: right;">
@@ -64,6 +62,9 @@
         </label><br>
         <label>Show blobs centers
           <input onclick="$('.circles').toggle()" type="checkbox">
+        </label><br>
+        <label>Toggle biome map
+          <input id="biomeInput" type="checkbox">
         </label>
       </div>
       <div>
@@ -172,6 +173,7 @@
   <script src="src/js/rivers.js"></script>
   <script src="src/js/terrain.js"></script>
   <script src="src/js/utils.js"></script>
+  <script src="src/js/biomes.js"></script>
 
   <script defer src="main.js"></script>
 </body>
