@@ -30,6 +30,7 @@
       <button id="random_map_button">Random map</button>
       <button id="clear_button">Clear</button>
       <button onclick="$('#options').fadeToggle()">Options</button>
+      <button onclick="$('#biome_settings').fadeToggle()">Biome settings</button>
       <button id="resetZoom">Reset zoom</button>
       <span>Cell: <span id="cell">0</span>; Height: <span id="height">0</span>; <span id="feature">no</span>;</span>
       Flux: <span id="flux">no</span>; Precipitation: <span id="precipitation">no</span>; River: <span
@@ -160,6 +161,22 @@
           </div>
         </div>
       </div>
+    </div>
+    <div id="biome_settings" hidden>
+      <br />
+      <!-- TODO: Button on click function to add another biome -->
+      <button id="add_biome_button">Add biome</button>
+      <div id="biomes_colors_table"></div>
+      <br />
+      <label>Whittaker biomes
+        <input id="whittakerBiomes" type="checkbox">
+      </label><br>
+      <div id="biomes_matrix_table"></div>
+      <br />
+      <button id="biome_matrix_chart_button">Generate biome matrix chart</button>
+      <div id="biome_matrix_chart"></div>
+      <button id="biome_polygons_chart_button">Generate polygons biomes chart</button>
+      <div id="biome_polygons_chart"></div>
     </div>
   </div>
 

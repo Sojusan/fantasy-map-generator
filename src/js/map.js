@@ -319,6 +319,9 @@ function randomMap(count) {
     calculateMapCoordinates();
     calculateTemperature();
     calculatePrecipitation();
+    loadDefaultBiomeSettings();
+    createBiomesColorsTable();
+    createBiomesMatrixTable();
     assignBiomes();
     resolveDepressions();
     downCutRivers();

@@ -1,7 +1,7 @@
 // Redraw all polygons on options change
 $("#mapStyle, #hatchingInput").change(() => drawMapBase());
 
-// Draw of remove blur polygons on input change
+// Draw or remove blur polygons on input change
 $("#blurInput").change(() => {
     if (blurInput.checked == true) {
         d3.selectAll(".mapCells")

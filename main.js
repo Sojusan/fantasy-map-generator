@@ -18,11 +18,11 @@ document.getElementById("random_map_button").addEventListener("click", function 
     generate(11);
 });
 
-document.getElementById("worldControls").addEventListener("input", e => {
+document.getElementById("worldControls").addEventListener("input", event => {
     // Synchronize `range` with `numeric` input
-    if (e.target) {
-        document.getElementById(e.target.dataset.stored + "Input").value = e.target.value;
-        document.getElementById(e.target.dataset.stored + "Output").value = e.target.value;
+    if (event.target) {
+        document.getElementById(event.target.dataset.stored + "Input").value = event.target.value;
+        document.getElementById(event.target.dataset.stored + "Output").value = event.target.value;
     };
     calculateMapCoordinates();
     calculateTemperature();
@@ -49,6 +49,12 @@ let grid = viewbox.append("g").attr("class", "grid");
 let cursor = viewbox.append("g").append("circle").attr("r", 1).attr("class", "cursor");
 let land = undefined;
 let riversData = [];
+
+// Biomes settings
+let biomesArray = [];
+let biomesMatrix = [];
+let precipitationLimitsArray = [];
+let temperatureLimitsArray = [];
 
 let mapCoordinates = {}; // map coordinates on globe
 
