@@ -75,3 +75,18 @@ $("#biomeInput").change(() => {
         d3.selectAll(".biome").remove();
     };
 });
+
+// Toggle grayscale map
+$("#grayscaleInput").change(() => {
+    if (grayscaleInput.checked == true) {
+        polygons.map(polygon => {
+            grid.append("path")
+                    .attr("d", "M" + polygon.join("L") + "Z")
+                    .attr("stroke", mapGrayscaleColor(1 - polygon.height))
+                    .attr("fill", mapGrayscaleColor(1 - polygon.height))
+                    .attr("class", "grayscale");
+        });
+    } else {
+        d3.selectAll(".grayscale").remove();
+    };
+});

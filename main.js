@@ -72,6 +72,7 @@ let voronoi = delaunay.voronoi([0, 0, mapWidth, mapHeight]);
 let polygons = Array.from(voronoi.cellPolygons());
 // Colors D3 interpolation
 let mapColor = d3.scaleSequential(d3.interpolateSpectral);
+let mapGrayscaleColor = d3.scaleSequential(d3.interpolateGreys);
 let fluxColor = d3.scaleSequential(d3.interpolateBlues);
 let temperatureColor = d3.scaleSequential(d3.interpolateReds);
 // Queue array
