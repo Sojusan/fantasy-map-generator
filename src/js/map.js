@@ -154,6 +154,7 @@ function drawCoastline() {
     console.time("drawCoastline");
     d3.selectAll(".coastlines").remove();
     let line = [];  // Array to store coastline edges
+    let borderPoints = []; // Help array to fix the island on the image border
     for (let index = 0; index < polygons.length; index++) {
         if (polygons[index].height >= 0.2) {
             for (let neighbor of voronoi.neighbors(index)) {
@@ -171,10 +172,44 @@ function drawCoastline() {
                         number = polygons[neighbor].featureNumber;
                     };
                     line.push({ start, end, type, number });
+
+                    if (edgePoints[0][0] === 0 || edgePoints[0][0] === mapWidth || edgePoints[0][1] === 0 || edgePoints[0][1] === mapHeight) {
+                        let name = polygons[index].featureName;
+                        let point = start;
+                        borderPoints.push({ point, name, type, number });
+                    };
+                    if (edgePoints[1][0] === 0 || edgePoints[1][0] === mapWidth || edgePoints[1][1] === 0 || edgePoints[1][1] === mapHeight) {
+                        let name = polygons[index].featureName;
+                        let point = end;
+                        borderPoints.push({ point, name, type, number });
+                    };
                 };
             };
         };
     };
+
+    // Fix the border points
+    while (borderPoints.length) {
+        let firstPoint = borderPoints[0];
+        let workPoints = borderPoints.filter(point => point.name === firstPoint.name);
+
+        workPoints.sort((a, b) => {
+            const [a1, a2] = a.point.split(" ").map(Number);
+            const [b1, b2] = b.point.split(" ").map(Number);
+
+            return a1 - b1 || a2 - b2;
+        });
+        if (workPoints.length) {
+            let start = workPoints[0].point;
+            let end = workPoints.at(-1).point;
+            let type = workPoints[0].type;
+            let number = workPoints[0].number;
+            line.push({ start, end, type, number });
+        };
+
+        borderPoints = borderPoints.filter(point => point.name !== firstPoint.name);
+    };
+
     // Scales and line for paths drawing
     let x = d3.scaleLinear().domain([0, mapWidth]).range([0, mapWidth]);
     let y = d3.scaleLinear().domain([0, mapHeight]).range([0, mapHeight]);

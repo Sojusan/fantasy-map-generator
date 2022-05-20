@@ -34,7 +34,8 @@ let svg = d3.select("svg");
 let mapWidth = +svg.attr("width");
 let mapHeight = +svg.attr("height");
 let defs = svg.select("defs");
-let viewbox = svg.append("g").attr("class", "viewbox").on("touchmove mousemove", moved);
+let viewbox = svg.append("g").attr("class", "viewbox")
+  .on("touchmove mousemove", moved).on("click", viewbox_clicked);
 let islandBack = viewbox.append("g").attr("class", "islandBack");
 let mapCells = viewbox.append("g").attr("class", "mapCells");
 let hatching = viewbox.append("g").attr("class", "hatching");
@@ -240,40 +241,39 @@ function undraw() {
   }
 
 // Add a blob on mouse click
-svg.on("click", event => {
-    // Draw a circle in center in clicked point
-    let point = d3.pointer(event);
-    let nearest = delaunay.find(point[0], point[1]);
-    circles.append("circle")
-        .attr("r", 3)
-        .attr("cx", point[0])
-        .attr("cy", point[1])
-        .attr("fill", mapColor(1 - heightInput.valueAsNumber))
-        .attr("class", "circle");
-    if ($(".circle").length == 1) {
-        add(nearest, "island");
-        // Change options to defaults for hills
-        heightInput.value = 0.2;
-        heightOutput.value = 0.2;
-        radiusInput.value = 0.99;
-        radiusOutput.value = 0.99;
-    } else {
-        add(nearest, "hill");
-        // Let's make height random for hills
-        let height = (Math.random() * 0.4 + 0.1).toFixed(2);
-        heightInput.value = height;
-        heightOutput.value = height;
-    };
-    // Process with calculations
-    viewbox.selectAll("path").remove();
-    viewbox.selectAll("rect").remove();
-    markFeatures();
-    drawCoastline();
-    drawMapBase();
-});
+function viewbox_clicked(event) {
+  // Draw a circle in center in clicked point
+  let point = d3.pointer(event);
+  let nearest = delaunay.find(point[0], point[1]);
+  circles.append("circle")
+      .attr("r", 3)
+      .attr("cx", point[0])
+      .attr("cy", point[1])
+      .attr("fill", mapColor(1 - heightInput.valueAsNumber))
+      .attr("class", "circle");
+  if ($(".circle").length == 1) {
+      add(nearest, "island");
+      // Change options to defaults for hills
+      heightInput.value = 0.2;
+      heightOutput.value = 0.2;
+      radiusInput.value = 0.99;
+      radiusOutput.value = 0.99;
+  } else {
+      add(nearest, "hill");
+      // Let's make height random for hills
+      let height = (Math.random() * 0.4 + 0.1).toFixed(2);
+      heightInput.value = height;
+      heightOutput.value = height;
+  };
+  // Process with calculations
+  viewbox.selectAll("path").remove();
+  viewbox.selectAll("rect").remove();
+  markFeatures();
+  drawCoastline();
+  drawMapBase();
+};
 
-
-  // Initial generation
+// Initial generation
 let timeStart = Date.now();
 console.clear();
 generate(11);

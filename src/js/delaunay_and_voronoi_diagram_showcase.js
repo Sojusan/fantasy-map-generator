@@ -57,12 +57,12 @@ function voronoi_vertex() {
     return vertex_coords;
 }
 
-console.log(sites[0]);
-console.log(d3.polygonCentroid(voronoi.cellPolygon(0)));
-console.log(voronoi.cellPolygon(0));
-console.log(voronoi);
-console.log(circumcenters_coords());
-console.log(voronoi_vertex());
+// console.log(sites[0]);
+// console.log(d3.polygonCentroid(voronoi.cellPolygon(0)));
+// console.log(voronoi.cellPolygon(0));
+// console.log(voronoi);
+// console.log(circumcenters_coords());
+// console.log(voronoi_vertex());
 
 draw_all();
 
