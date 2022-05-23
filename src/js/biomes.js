@@ -71,20 +71,9 @@ function createBiomesColorsTable() {
     let biomesColorsTable = document.querySelector("#biomes_colors_table");
     let table = document.createElement("table");
     let headerValuesArray = Object.keys(biomesArray[0]);
-    headerValuesArray.push("action");
     let thead = createTableHeader(headerValuesArray);
     table.appendChild(thead);
     let tbody = document.createElement("tbody");
-
-    // TODO: Add functionality to inputs
-
-    // TODO: Add biome changing mechanics (select from table and then click on map)
-
-    // let tdDelete = document.createElement("td");
-    // let deleteButton = document.createElement("button");
-    // deleteButton.textContent = "Delete";
-    // TODO: Add delete function on click ONLY ON CUSTOM BIOMES
-    // tdDelete.appendChild(document.createTextNode(""));
 
     biomesArray.forEach((value) => {
         let tr = document.createElement("tr");

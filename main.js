@@ -117,7 +117,7 @@ function generate(count) {
     };
   };
 
-  // Mouse movement
+// Mouse movement
 function moved(event) {
     // Update cursor and debug div on mousemove
     let point = d3.pointer(event);
@@ -242,35 +242,37 @@ function undraw() {
 
 // Add a blob on mouse click
 function viewbox_clicked(event) {
-  // Draw a circle in center in clicked point
-  let point = d3.pointer(event);
-  let nearest = delaunay.find(point[0], point[1]);
-  circles.append("circle")
-      .attr("r", 3)
-      .attr("cx", point[0])
-      .attr("cy", point[1])
-      .attr("fill", mapColor(1 - heightInput.valueAsNumber))
-      .attr("class", "circle");
-  if ($(".circle").length == 1) {
-      add(nearest, "island");
-      // Change options to defaults for hills
-      heightInput.value = 0.2;
-      heightOutput.value = 0.2;
-      radiusInput.value = 0.99;
-      radiusOutput.value = 0.99;
-  } else {
-      add(nearest, "hill");
-      // Let's make height random for hills
-      let height = (Math.random() * 0.4 + 0.1).toFixed(2);
-      heightInput.value = height;
-      heightOutput.value = height;
+  if (lock_button.getAttribute("status") == 0) {
+      // Draw a circle in center in clicked point
+      let point = d3.pointer(event);
+      let nearest = delaunay.find(point[0], point[1]);
+      circles.append("circle")
+        .attr("r", 3)
+        .attr("cx", point[0])
+        .attr("cy", point[1])
+        .attr("fill", mapColor(1 - heightInput.valueAsNumber))
+        .attr("class", "circle");
+    if ($(".circle").length == 1) {
+        add(nearest, "island");
+        // Change options to defaults for hills
+        heightInput.value = 0.2;
+        heightOutput.value = 0.2;
+        radiusInput.value = 0.99;
+        radiusOutput.value = 0.99;
+    } else {
+        add(nearest, "hill");
+        // Let's make height random for hills
+        let height = (Math.random() * 0.4 + 0.1).toFixed(2);
+        heightInput.value = height;
+        heightOutput.value = height;
+    };
+    // Process with calculations
+    viewbox.selectAll("path").remove();
+    viewbox.selectAll("rect").remove();
+    markFeatures();
+    drawCoastline();
+    drawMapBase();
   };
-  // Process with calculations
-  viewbox.selectAll("path").remove();
-  viewbox.selectAll("rect").remove();
-  markFeatures();
-  drawCoastline();
-  drawMapBase();
 };
 
 // Initial generation
