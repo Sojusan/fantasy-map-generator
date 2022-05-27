@@ -1,207 +1,358 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <title>Map Generator</title>
+    <link rel="stylesheet" href="src/css/home.css" />
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="alternate icon" href="favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<head>
-  <title>Map Generator</title>
-  <link rel="stylesheet" href="src/css/home.css" />
-  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
-  <link rel="alternate icon" href="favicon.ico" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="libs/d3.min.js"></script>
+    <script src="libs/jquery-3.6.0.min.js"></script>
+    <script src="libs/path-data-polyfill.js"></script>
+    <script src="libs/canvg.min.js"></script>
+    <script src="libs/jszip.min.js"></script>
+    <script src="libs/FileSaver.min.js"></script>
+  </head>
 
-  <script src="libs/d3.min.js"></script>
-  <script src="libs/jquery-3.6.0.min.js"></script>
-  <script src="libs/path-data-polyfill.js"></script>
-  <script src="libs/canvg.min.js"></script>
-  <script src="libs/jszip.min.js"></script>
-  <script src="libs/FileSaver.min.js"></script>
-</head>
-
-<body>
-  <form action="/src/pages/delaunay_and_voronoi_diagram_showcase.html">
-    <input type="submit" value="Voronoi diagram" />
-  </form>
-  <h1>Map Generator</h1>
-  <div>
-    <svg id="svg" width="800" height="600">
-      <defs>
-        <filter id="blurFilter" x="-1" y="-1" width="100" height="100">
-          <feGaussianBlur in="SourceGraphic" stdDeviation="0.5" />
-        </filter>
-        <mask id="shape">
-          <rect x="0" y="0" width="100%" height="100%" fill="white" />
-        </mask>
-        <pattern id="shallowHatch" width="2" height="4" patternTransform="rotate(90 0 0)" patternUnits="userSpaceOnUse">
-          <line x1="0" y1="0" x2="0" y2="4" style="stroke: black; stroke-width: 0.5; fill: black;" />
-        </pattern>
-      </defs>
-    </svg>
+  <body>
+    <form action="/src/pages/delaunay_and_voronoi_diagram_showcase.html">
+      <input type="submit" value="Voronoi diagram" />
+    </form>
+    <h1>Map Generator</h1>
     <div>
-      <button id="lock_button" status="1" title="Editable/Locked map">Edit/Locked</button>
-      <button id="random_map_button">Random map</button>
-      <button id="clear_button">Clear</button>
-      <button id="export_button">Export UE4</button>
-      <button onclick="$('#options').fadeToggle()">Options</button>
-      <button onclick="$('#biome_settings').fadeToggle()">Biome settings</button>
-      <button id="resetZoom">Reset zoom</button>
-      <span>Cell: <span id="cell">0</span>; Height: <span id="height">0</span>; <span id="feature">no</span>;</span>
-      Flux: <span id="flux">no</span>; Precipitation: <span id="precipitation">no</span>; River: <span
-        id="river">no</span>; Temperature: <span id="temperature">no</span>; Biome: <span id="biome">no</span>;
-    </div>
-    <div id="options" style="font-size: small;" hidden>
-      <div style="width: 50%; float: right;">
-        <label>Map Style: </label>
-        <select id="mapStyle">
-          <option value="polygonal">Polygonal</option>
-          <option value="flat" selected>Flat</option>
-        </select><br>
-        <label>Slope hatching
-          <input id="hatchingInput" type="checkbox">
-        </label><br>
-        <label>Grayscale
-          <input id="grayscaleInput" type="checkbox">
-        </label><br>
-        <label>Blur
-          <input id="blurInput" type="checkbox">
-        </label><br>
-        <label>Voronoi polygons
-          <input id="strokesInput" type="checkbox">
-        </label><br>
-        <label>Draw sea polygons
-          <input id="seaInput" type="checkbox">
-        </label><br>
-        <label>Toggle flux map
-          <input id="fluxInput" type="checkbox">
-        </label><br>
-        <label>Toggle temperature map
-          <input id="temperatureInput" type="checkbox">
-        </label><br>
-        <label>Show blobs centers
-          <input onclick="$('.circles').toggle()" type="checkbox">
-        </label><br>
-        <label>Toggle biome map
-          <input id="biomeInput" type="checkbox">
-        </label>
-      </div>
+      <svg id="svg" width="800" height="600">
+        <defs>
+          <filter id="blurFilter" x="-1" y="-1" width="100" height="100">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="0.5" />
+          </filter>
+          <mask id="shape">
+            <rect x="0" y="0" width="100%" height="100%" fill="white" />
+          </mask>
+          <pattern
+            id="shallowHatch"
+            width="2"
+            height="4"
+            patternTransform="rotate(90 0 0)"
+            patternUnits="userSpaceOnUse"
+          >
+            <line
+              x1="0"
+              y1="0"
+              x2="0"
+              y2="4"
+              style="stroke: black; stroke-width: 0.5; fill: black"
+            />
+          </pattern>
+        </defs>
+      </svg>
       <div>
-        <label>Points radius:</label>
-        <input id="sizeInput" value="4" type="range" min="1" max="10" step="1"
-          oninput="sizeOutput.value = sizeInput.valueAsNumber"
-          title="Radius between points used for Poisson-disc sampling">
-        <output id="sizeOutput" title="Radius between points used for Poisson-disc sampling">4</output>
-        <br>
-        <label>Max Height:</label>
-        <input id="heightInput" value="0.9" type="range" min="0.1" max="1" step="0.01"
-          oninput="heightOutput.value = heightInput.valueAsNumber">
-        <output id="heightOutput">0.9</output>
-        <br>
-        <label>Blob Radius:</label>
-        <input id="radiusInput" value="0.9" type="range" min="0.5" max="0.999" step="0.001"
-          oninput="radiusOutput.value = radiusInput.valueAsNumber" title="Change gently!">
-        <output id="radiusOutput" title="Change gently!">0.9</output>
-        <br>
-        <label>Blog Sharpness:</label>
-        <input id="sharpnessInput" value="0.2" type="range" min="0" max="0.4" step="0.2"
-          oninput="sharpnessOutput.value = sharpnessInput.valueAsNumber">
-        <output id="sharpnessOutput">0.2</output>
-        <br>
-        <label>Prevailing winds: </label>
-        <label>Random<input type="checkbox" id="randomWinds" checked></label>|
-        <label>N<input type="checkbox" id="north"></label>|
-        <label>E<input type="checkbox" id="east"></label>|
-        <label>S<input type="checkbox" id="south"></label>|
-        <label>W<input type="checkbox" id="west"></label><br>
-        <label>Wave power:</label>
-        <input id="wavepowerInput" value="0.5" type="range" min="0" max="1" step="0.01"
-          oninput="wavepowerOutput.value = wavepowerInput.valueAsNumber">
-        <output id="wavepowerOutput">0.5</output>
-        <br>
-        <label>Downcutting:</label>
-        <input id="downCuttingInput" value="0.1" type="range" min="0" max="0.5" step="0.01"
-          oninput="downCuttingOutput.value = downCuttingInput.valueAsNumber">
-        <output id="downCuttingOutput">0.1</output>
-        <br>
-        <label>Precipitation:</label>
-        <input id="precipitationInput" value="7" type="range" min="0" max="10" step="0.1"
-          oninput="precipitationOutput.value = precipitationInput.valueAsNumber">
-        <output id="precipitationOutput">7</output>
+        <button id="lock_button" status="1" title="Change to edit/locked state">Locked</button>
+        <button id="random_map_button" title="Generate a new random map">Random map</button>
+        <button id="clear_button" title="Clear the map from all elements">Clear</button>
+        <button
+          id="export_button"
+          title="Download the images used during Unreal Engine 4 export feature"
+        >
+          Export UE4
+        </button>
+        <button onclick="$('#options').fadeToggle()" title="Global settings">Options</button>
+        <button onclick="$('#biome_settings').fadeToggle()" title="Biome settings">
+          Biome settings
+        </button>
+        <button id="resetZoom" title="Return to default zoom level">Reset zoom</button>
+        <span
+          >Cell: <span id="cell">0</span>; Height: <span id="height">0</span>;
+          <span id="feature">no</span>;</span
+        >
+        Flux: <span id="flux">no</span>; Precipitation: <span id="precipitation">no</span>; River:
+        <span id="river">no</span>; Temperature: <span id="temperature">no</span>; Biome:
+        <span id="biome">no</span>;
       </div>
-      <div>
-        <br>
-        <label>World configuration:</label>
+      <div id="options" style="font-size: small" hidden>
+        <div style="width: 50%; float: right">
+          <div title="Choose the map style">
+            <label>Map Style: </label>
+            <select id="mapStyle">
+              <option value="polygonal">Polygonal</option>
+              <option value="flat" selected>Flat</option></select
+            ><br />
+          </div>
+          <div title="If show the map in the grayscale">
+            <label>Grayscale <input id="grayscaleInput" type="checkbox" /> </label><br />
+          </div>
+          <div title="If blur the map">
+            <label>Blur <input id="blurInput" type="checkbox" /> </label><br />
+          </div>
+          <div title="If show the voronoi polygons on he map">
+            <label>Voronoi polygons <input id="strokesInput" type="checkbox" /> </label><br />
+          </div>
+          <div title="If show the precipitation map">
+            <label>Toggle flux map <input id="fluxInput" type="checkbox" /> </label><br />
+          </div>
+          <div title="If show the temperature map">
+            <label>Toggle temperature map <input id="temperatureInput" type="checkbox" /> </label
+            ><br />
+          </div>
+          <div title="If show the initial points of the land generation">
+            <label
+              >Show blobs centers <input onclick="$('.circles').toggle()" type="checkbox" /> </label
+            ><br />
+          </div>
+          <div title="If show the biome map">
+            <label
+              >Toggle biome map
+              <input id="biomeInput" type="checkbox" />
+            </label>
+          </div>
+        </div>
         <div>
-          <label title="Set height exponent, i.e. a value for altitude change sharpness. Altitude affects temperature and hence biomes">
-            <i>Height exponent:</i>
-            <input id="heightExponentOutput" type="range" min=1.5 max=2.2 value=2 step=.01>
-            <input id="heightExponentInput" data-stored="heightExponent" type="number" min=1.5 max=2.2 value=2 step=.01>
-          </label>
+          <div
+            title="The radius between points used for Poisson-disc sampling. Less means more polygons"
+          >
+            <label>Points radius:</label>
+            <input
+              id="sizeInput"
+              value="4"
+              type="range"
+              min="1"
+              max="10"
+              step="1"
+              oninput="sizeOutput.value = sizeInput.valueAsNumber"
+            />
+            <output id="sizeOutput">4</output>
+            <br />
+          </div>
+          <div title="The maximum allowed height value in the generated block">
+            <label>Max Height:</label>
+            <input
+              id="heightInput"
+              value="0.9"
+              type="range"
+              min="0.1"
+              max="1"
+              step="0.01"
+              oninput="heightOutput.value = heightInput.valueAsNumber"
+            />
+            <output id="heightOutput">0.9</output>
+            <br />
+          </div>
+          <div title="The size of the area in which the new terrain is to be added">
+            <label>Blob Radius:</label>
+            <input
+              id="radiusInput"
+              value="0.9"
+              type="range"
+              min="0.5"
+              max="0.999"
+              step="0.001"
+              oninput="radiusOutput.value = radiusInput.valueAsNumber"
+            />
+            <output id="radiusOutput">0.9</output>
+            <br />
+          </div>
+          <div title="The sharpness of added terrain">
+            <label>Blog Sharpness:</label>
+            <input
+              id="sharpnessInput"
+              value="0.2"
+              type="range"
+              min="0"
+              max="0.4"
+              step="0.2"
+              oninput="sharpnessOutput.value = sharpnessInput.valueAsNumber"
+            />
+            <output id="sharpnessOutput">0.2</output>
+            <br />
+          </div>
+          <div title="The direction of prevailing winds with precipitation">
+            <label>Prevailing winds: </label>
+            <label>Random<input type="checkbox" id="randomWinds" checked /></label>|
+            <label>N<input type="checkbox" id="north" /></label>|
+            <label>E<input type="checkbox" id="east" /></label>|
+            <label>S<input type="checkbox" id="south" /></label>|
+            <label>W<input type="checkbox" id="west" /></label><br />
+          </div>
+          <div title="The value by which to reduce the final elevation map">
+            <label>Downcutting:</label>
+            <input
+              id="downCuttingInput"
+              value="0.1"
+              type="range"
+              min="0"
+              max="0.5"
+              step="0.01"
+              oninput="downCuttingOutput.value = downCuttingInput.valueAsNumber"
+            />
+            <output id="downCuttingOutput">0.1</output>
+            <br />
+          </div>
+          <div title="Precipitation intensity level">
+            <label>Precipitation:</label>
+            <input
+              id="precipitationInput"
+              value="7"
+              type="range"
+              min="0"
+              max="10"
+              step="0.1"
+              oninput="precipitationOutput.value = precipitationInput.valueAsNumber"
+            />
+            <output id="precipitationOutput">7</output>
+          </div>
         </div>
-        <div id="worldControls">
-          <div>
-            <label title="Set temperature at equator">
-              <i>Equator temperature:</i>
-              <input id="temperatureEquatorInput" data-stored="temperatureEquator" type="number" min=-50 max=50 value=27>°C
-              <input id="temperatureEquatorOutput" data-stored="temperatureEquator" type="range" min=-50 max=50 value=27>
-            </label>
-          </div>
-          <div>
-            <label title="Set temperature near poles">
-              <i>Poles temperature:</i>
-              <input id="temperaturePoleInput" data-stored="temperaturePole" type="number" min=-50 max=50 value=-23>°C
-              <input id="temperaturePoleOutput" data-stored="temperaturePole" type="range" min=-50 max=50 value=-23>
-            </label>
-          </div>
-          <div>
-            <label title="Set map size relative to the world size">
-              <i>Map size:</i>
-              <input id="mapSizeInput" data-stored="mapSize" type="number" min=1 max=100 value=100>%
-              <input id="mapSizeOutput" data-stored="mapSize" type="range" min=1 max=100 value=100>
-            </label>
-          </div>
-          <div>
-            <label title="Set a North-South map shift">
-              <i>Latitudes:</i>
-              <input id="latitudeInput" data-stored="latitude" type="number" min=0 max=100 step=1 value=50>
-              <i>N</i>
-              <input id="latitudeOutput" data-stored="latitude" type="range" min=0 max=100 step=1 value=50>
-              <i>S</i>
-            </label>
-          </div>
-          <div>
-            <label title="Set precipitation - water amount clouds can bring. Defines rivers and biomes generation">
-              <i>Precipitation:</i>
-              <input id="precipitationIntenseInput" data-stored="precipitation" type="number" min=0 max=500 value=50>
-              <input id="precipitationIntenseOutput" data-stored="precipitation" type="range" min=0 max=500 value=50>
-            </label>
+        <div>
+          <br />
+          <label>World configuration:</label>
+          <div id="worldControls">
+            <div>
+              <label
+                title="Set height exponent, i.e. a value for altitude change sharpness. Altitude affects temperature and hence biomes"
+              >
+                <i>Height exponent:</i>
+                <input
+                  id="heightExponentInput"
+                  data-stored="heightExponent"
+                  type="number"
+                  min="1.5"
+                  max="2.2"
+                  value="2"
+                  step=".01"
+                />
+                <input
+                  id="heightExponentOutput"
+                  data-stored="heightExponent"
+                  type="range"
+                  min="1.5"
+                  max="2.2"
+                  value="2"
+                  step=".01"
+                />
+              </label>
+            </div>
+            <div>
+              <label title="Set temperature at equator">
+                <i>Equator temperature:</i>
+                <input
+                  id="temperatureEquatorInput"
+                  data-stored="temperatureEquator"
+                  type="number"
+                  min="-50"
+                  max="50"
+                  value="27"
+                />°C
+                <input
+                  id="temperatureEquatorOutput"
+                  data-stored="temperatureEquator"
+                  type="range"
+                  min="-50"
+                  max="50"
+                  value="27"
+                />
+              </label>
+            </div>
+            <div>
+              <label title="Set temperature near poles">
+                <i>Poles temperature:</i>
+                <input
+                  id="temperaturePoleInput"
+                  data-stored="temperaturePole"
+                  type="number"
+                  min="-50"
+                  max="50"
+                  value="-23"
+                />°C
+                <input
+                  id="temperaturePoleOutput"
+                  data-stored="temperaturePole"
+                  type="range"
+                  min="-50"
+                  max="50"
+                  value="-23"
+                />
+              </label>
+            </div>
+            <div>
+              <label title="Set map size relative to the world size">
+                <i>Map size:</i>
+                <input
+                  id="mapSizeInput"
+                  data-stored="mapSize"
+                  type="number"
+                  min="1"
+                  max="100"
+                  value="100"
+                />%
+                <input
+                  id="mapSizeOutput"
+                  data-stored="mapSize"
+                  type="range"
+                  min="1"
+                  max="100"
+                  value="100"
+                />
+              </label>
+            </div>
+            <div>
+              <label title="Set a North-South map shift">
+                <i>Latitudes:</i>
+                <input
+                  id="latitudeInput"
+                  data-stored="latitude"
+                  type="number"
+                  min="0"
+                  max="100"
+                  step="1"
+                  value="50"
+                />
+                <i>N</i>
+                <input
+                  id="latitudeOutput"
+                  data-stored="latitude"
+                  type="range"
+                  min="0"
+                  max="100"
+                  step="1"
+                  value="50"
+                />
+                <i>S</i>
+              </label>
+            </div>
           </div>
         </div>
       </div>
+      <div id="biome_settings" hidden>
+        <br />
+        <div id="biomes_colors_table"></div>
+        <br />
+        <div title="If normalize the biomes to the Whittaker's standard">
+          <label>Whittaker biomes <input id="whittakerBiomes" type="checkbox" /> </label><br />
+        </div>
+        <div id="biomes_matrix_table"></div>
+        <br />
+        <button id="biome_matrix_chart_button" title="Generate the biome matrix chart">
+          Generate biome matrix chart
+        </button>
+        <div id="biome_matrix_chart"></div>
+        <button
+          id="biome_polygons_chart_button"
+          title="Generate the chart with data from every polygon"
+        >
+          Generate polygons biomes chart
+        </button>
+        <div id="biome_polygons_chart"></div>
+      </div>
     </div>
-    <div id="biome_settings" hidden>
-      <br />
-      <div id="biomes_colors_table"></div>
-      <br />
-      <label>Whittaker biomes
-        <input id="whittakerBiomes" type="checkbox">
-      </label><br>
-      <div id="biomes_matrix_table"></div>
-      <br />
-      <button id="biome_matrix_chart_button">Generate biome matrix chart</button>
-      <div id="biome_matrix_chart"></div>
-      <button id="biome_polygons_chart_button">Generate polygons biomes chart</button>
-      <div id="biome_polygons_chart"></div>
-    </div>
-  </div>
 
-  <script src="src/js/map.js"></script>
-  <script src="src/js/names.js"></script>
-  <script src="src/js/options.js"></script>
-  <script src="src/js/rivers.js"></script>
-  <script src="src/js/terrain.js"></script>
-  <script src="src/js/utils.js"></script>
-  <script src="src/js/biomes.js"></script>
-  <script src="src/js/export.js"></script>
+    <script src="src/js/map.js"></script>
+    <script src="src/js/names.js"></script>
+    <script src="src/js/options.js"></script>
+    <script src="src/js/rivers.js"></script>
+    <script src="src/js/terrain.js"></script>
+    <script src="src/js/utils.js"></script>
+    <script src="src/js/biomes.js"></script>
+    <script src="src/js/export.js"></script>
 
-  <script defer src="main.js"></script>
-</body>
-
+    <script defer src="main.js"></script>
+  </body>
 </html>

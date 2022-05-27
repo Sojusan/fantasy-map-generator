@@ -1,28 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
+  <head>
     <title>Map Generator</title>
     <link rel="stylesheet" href="../css/style.css" />
     <link rel="icon" type="image/svg+xml" href="../../favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-</head>
+  </head>
 
-<body>
+  <body>
     <form action="/">
-        <input type="submit" value="Map generator" />
+      <input type="submit" value="Map generator" />
     </form>
     <h1>Map Generator</h1>
 
     <h2>Delaunay and Voronoi diagram showcase</h2>
     <div>
-        <svg id="svg" width="800" height="600"></svg>
-        <br /><button id="relax-button">Relax</button> <span>Iteration:</span>
-        <input id="iteration" value="0" />
+      <svg id="svg" width="800" height="600"></svg>
+      <br /><button id="relax-button">Relax</button> <span>Iteration:</span>
+      <input id="iteration" value="0" />
     </div>
 
     <script type="module" src="../js/delaunay_and_voronoi_diagram_showcase.js"></script>
     <script src="../../libs/d3.min.js"></script>
-</body>
-
+  </body>
 </html>

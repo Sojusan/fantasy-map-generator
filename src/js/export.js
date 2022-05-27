@@ -1,7 +1,5 @@
 d3.select("#export_button").on("click", exportPNG);
 
-console.log("test");
-
 let zip = new JSZip();
 
 function exportPNG() {

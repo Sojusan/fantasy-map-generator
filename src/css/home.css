@@ -141,109 +141,112 @@ progress {
 }
 
 svg {
-  background-color: #5E4FA2;
+  background-color: #5e4fa2;
 }
 
 .cursor {
-fill: none;
+  fill: none;
 }
 
 .mapCells {
-stroke-width: 0.1;
+  stroke-width: 0.1;
 }
 
 .mapShade {
-fill: none;
-stroke: black;
-opacity: 0.9;
-stroke-width: 0.5px;
-filter: url(#blurFilter);
+  fill: none;
+  stroke: black;
+  opacity: 0.9;
+  stroke-width: 0.5px;
+  filter: url(#blurFilter);
 }
 
 .hillHatch {
-fill: none;
-stroke: grey;
-stroke-width: 1;
-stroke-dasharray: 0.1, 0.5;
+  fill: none;
+  stroke: grey;
+  stroke-width: 1;
+  stroke-dasharray: 0.1, 0.5;
 }
 
 .cells {
-stroke: grey;
-stroke-width: 0.1;
-opacity: 0.5;
-fill: none;
+  stroke: grey;
+  stroke-width: 0.1;
+  opacity: 0.5;
+  fill: none;
 }
 
 .flux {
-stroke-width: 0.1;
-opacity: 0.7;
+  stroke-width: 0.1;
+  opacity: 0.7;
 }
 
 .circle {
-stroke: black;
-stroke-width: 1;
+  stroke: black;
+  stroke-width: 1;
 }
 
 .islandBack {
-stroke: none;
+  stroke: none;
 }
 
 .coastline {
-fill: none;
-stroke-width: 0.3;
-stroke: black;
-opacity: 0.9;
-filter: url(#blurFilter);
+  fill: none;
+  stroke-width: 0.3;
+  stroke: black;
+  opacity: 0.9;
+  filter: url(#blurFilter);
 }
 
 .lakecoast {
-fill: #4D83AE;
-stroke: #386e98;
-stroke-width: 0.2;
+  fill: #4d83ae;
+  stroke: #386e98;
+  stroke-width: 0.2;
 }
 
 .lakeShade {
-fill: none;
-stroke-linecap: round;
-stroke: #325e82;
-stroke-width: 1;
-opacity: 0.5;
-filter: url(#blurFilter);
+  fill: none;
+  stroke-linecap: round;
+  stroke: #325e82;
+  stroke-width: 1;
+  opacity: 0.5;
+  filter: url(#blurFilter);
 }
 
 .oceanLayer {
-fill: #5E4FA2;
-mask: url(#shape);
+  fill: #5e4fa2;
+  mask: url(#shape);
 }
 
 .shallow {
-fill: url(#shallowHatch);
-mask: url(#shape);
-stroke: none;
-opacity: 0.8;
+  fill: url(#shallowHatch);
+  mask: url(#shape);
+  stroke: none;
+  opacity: 0.8;
 }
 
 .rivers {
-fill: none;
-stroke: #4D83AE;
-stroke-linecap: round;
+  fill: none;
+  stroke: #4d83ae;
+  stroke-linecap: round;
 }
 
 .riversShade {
-fill: none;
-stroke-linecap: round;
-stroke: black;
-opacity: 0.9;
-filter: url(#blurFilter);
+  fill: none;
+  stroke-linecap: round;
+  stroke: black;
+  opacity: 0.9;
+  filter: url(#blurFilter);
 }
 
 .hatching {
-fill: none;
-stroke: grey;
-stroke-width: 0.1;
+  fill: none;
+  stroke: grey;
+  stroke-width: 0.1;
 }
 
-table, tr, th, td {
+table,
+tr,
+th,
+td {
   color: #ccc;
   border: 2px solid #ccc;
   border-collapse: collapse;
