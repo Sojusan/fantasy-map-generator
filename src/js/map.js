@@ -1,3 +1,8 @@
+const CoastlineType = {
+  Island: "Island",
+  Lake: "Lake"
+};
+
 // Calculate map position on globe
 function calculateMapCoordinates() {
   const size = +document.getElementById("mapSizeOutput").value;
@@ -176,24 +181,24 @@ function drawCoastline() {
   viewbox.selectAll("g.lakecoast > path").remove();
   viewbox.selectAll("g.oceanLayer > rect").remove();
   viewbox.selectAll("g.islandBack > path").remove();
+  svg.select("#shape").selectAll("path").remove();
   polygons.forEach((polygon) => {
     polygon.type = undefined;
   });
-  // d3.selectAll(".coastlines").remove();
   let line = []; // Array to store coastline edges
   let borderPoints = []; // Help array to fix the island on the image border
-  for (let index = 0; index < polygons.length; index++) {
-    if (polygons[index].height >= 0.2) {
+  polygons.forEach((polygon, index) => {
+    if (polygon.height >= 0.2) {
       for (let neighbor of voronoi.neighbors(index)) {
         if (polygons[neighbor].height < 0.2) {
-          let edgePoints = getEdgePoints(polygons[index], polygons[neighbor]);
+          let edgePoints = getEdgePoints(polygon, polygons[neighbor]);
           let start = edgePoints[0].join(" ");
           let end = edgePoints[1].join(" ");
           let type, number;
           if (polygons[neighbor].featureType === "Ocean") {
             polygons[neighbor].type = "shallow";
             type = "Island";
-            number = polygons[index].featureNumber;
+            number = polygon.featureNumber;
           } else {
             type = "Lake";
             number = polygons[neighbor].featureNumber;
@@ -206,7 +211,7 @@ function drawCoastline() {
             edgePoints[0][1] === 0 ||
             edgePoints[0][1] === mapHeight
           ) {
-            let name = polygons[index].featureName;
+            let name = polygon.featureName;
             let point = start;
             borderPoints.push({ point, name, type, number });
           }
@@ -216,15 +221,14 @@ function drawCoastline() {
             edgePoints[1][1] === 0 ||
             edgePoints[1][1] === mapHeight
           ) {
-            let name = polygons[index].featureName;
+            let name = polygon.featureName;
             let point = end;
             borderPoints.push({ point, name, type, number });
           }
         }
       }
     }
-  }
-
+  });
   // Fix the border points
   while (borderPoints.length) {
     let firstPoint = borderPoints[0];
@@ -266,7 +270,6 @@ function drawCoastline() {
     }
     borderPoints = borderPoints.filter((point) => point.name !== firstPoint.name);
   }
-
   // Scales and line for paths drawing
   let x = d3.scaleLinear().domain([0, mapWidth]).range([0, mapWidth]);
   let y = d3.scaleLinear().domain([0, mapHeight]).range([0, mapHeight]);
@@ -275,86 +278,9 @@ function drawCoastline() {
     .x((point) => x(point.x))
     .y((point) => y(point.y))
     .curve(d3.curveBasisClosed);
-  // Find and draw continuous coastline (island/ocean)
-  let number = 0;
-  let type = "Island";
-  let edgesOfFeature = line.filter((edge) => edge.type == type && edge.number === number);
-  while (edgesOfFeature.length > 0) {
-    let coast = []; // Array to store coastline for feature
-    let { start, end } = edgesOfFeature.shift();
-    let spl = start.split(" ");
-    coast.push({
-      x: spl[0],
-      y: spl[1],
-    });
-    spl = end.split(" ");
-    coast.push({
-      x: spl[0],
-      y: spl[1],
-    });
-    for (let i = 0; end !== start && i < 2000; i++) {
-      let next = edgesOfFeature.filter((edge) => edge.start == end || edge.end == end);
-      if (next.length > 0) {
-        if (next[0].start == end) {
-          end = next[0].end;
-        } else if (next[0].end == end) {
-          end = next[0].start;
-        }
-        spl = end.split(" ");
-        coast.push({
-          x: spl[0],
-          y: spl[1],
-        });
-        let rem = edgesOfFeature.indexOf(next[0]);
-        edgesOfFeature.splice(rem, 1);
-      }
-    }
-    svg.select("#shape").append("path").attr("d", path(coast)).attr("fill", "black");
-    islandBack.append("path").attr("d", path(coast));
-    coastline.append("path").attr("d", path(coast));
-    number += 1;
-    edgesOfFeature = line.filter((edge) => edge.type == type && edge.number === number);
-  }
-  // Find and draw continuous coastline (lake/island)
-  number = 0;
-  type = "Lake";
-  edgesOfFeature = line.filter((edge) => edge.type == type && edge.number === number);
-
-  while (edgesOfFeature.length > 0) {
-    let coast = []; // Array to store coastline for feature
-    number += 1;
-    let { start, end } = edgesOfFeature.shift();
-    let spl = start.split(" ");
-    coast.push({
-      x: spl[0],
-      y: spl[1],
-    });
-    spl = end.split(" ");
-    coast.push({
-      x: spl[0],
-      y: spl[1],
-    });
-    for (let i = 0; end !== start && i < 2000; i++) {
-      let next = edgesOfFeature.filter((edge) => edge.start == end || edge.end == end);
-      if (next.length > 0) {
-        if (next[0].start == end) {
-          end = next[0].end;
-        } else if (next[0].end == end) {
-          end = next[0].start;
-        }
-        spl = end.split(" ");
-        coast.push({
-          x: spl[0],
-          y: spl[1],
-        });
-      }
-      let rem = edgesOfFeature.indexOf(next[0]);
-      edgesOfFeature.splice(rem, 1);
-    }
-    edgesOfFeature = line.filter((edge) => edge.type == type && edge.number === number);
-    lakecoast.append("path").attr("d", path(coast)).attr("class", "lakeShade");
-    lakecoast.append("path").attr("d", path(coast));
-  }
+  // Find and draw continuous coastline (island/ocean and lake/island)
+  findCoastline(CoastlineType.Island);
+  findCoastline(CoastlineType.Lake);
   oceanLayer
     .append("rect")
     .attr("x", 0)
@@ -362,6 +288,52 @@ function drawCoastline() {
     .attr("width", mapWidth)
     .attr("height", mapHeight);
   console.timeEnd("drawCoastline");
+
+  function findCoastline(type) {
+    let number = 0;
+    let edgesOfFeature = line.filter((edge) => edge.type == type && edge.number === number);
+    while (edgesOfFeature.length > 0) {
+      let coast = []; // Array to store coastline for feature
+      let { start, end } = edgesOfFeature.shift();
+      let spl = start.split(" ");
+      coast.push({
+        x: spl[0],
+        y: spl[1],
+      });
+      spl = end.split(" ");
+      coast.push({
+        x: spl[0],
+        y: spl[1],
+      });
+      while (end !== start) {
+        let next = edgesOfFeature.filter((edge) => edge.start == end || edge.end == end);
+        if (next.length > 0) {
+          if (next[0].start == end) {
+            end = next[0].end;
+          } else if (next[0].end == end) {
+            end = next[0].start;
+          }
+          spl = end.split(" ");
+          coast.push({
+            x: spl[0],
+            y: spl[1],
+          });
+          let rem = edgesOfFeature.indexOf(next[0]);
+          edgesOfFeature.splice(rem, 1);
+        }
+      }
+      edgesOfFeature = line.filter((edge) => edge.type == type && edge.number === number);
+      number += 1;
+      if (type === CoastlineType.Island) {
+        svg.select("#shape").append("path").attr("d", path(coast)).attr("fill", "black");
+        islandBack.append("path").attr("d", path(coast));
+        coastline.append("path").attr("d", path(coast));
+      } else {
+        lakecoast.append("path").attr("d", path(coast)).attr("class", "lakeShade");
+        lakecoast.append("path").attr("d", path(coast));
+      }
+    }
+  }
 }
 
 // Create random map
@@ -381,7 +353,7 @@ function randomMap(count) {
         .attr("cy", y)
         .attr("fill", mapColor(1 - heightInput.valueAsNumber))
         .attr("class", "circle");
-      add(rnd, "island");
+      add(rnd, TerrainType.Island);
       radiusInput.value = 0.99;
       radiusOutput.value = 0.99;
     } else {
@@ -406,7 +378,7 @@ function randomMap(count) {
         .attr("cy", polygons[rnd].point.y)
         .attr("fill", mapColor(1 - heightInput.valueAsNumber))
         .attr("class", "circle");
-      add(rnd, "hill");
+      add(rnd, TerrainType.Hill);
     }
   }
   heightInput.value = Math.random() * 0.4 + 0.1;
@@ -466,14 +438,6 @@ function drawRiverLines(riversCount) {
             }
             riverAmended.push({ x: stX, y: stY });
             riverAmended.push({ x: enX, y: enY });
-            // if (counter == 1) {
-            //   grid.append("circle").attr("r", 2).attr("fill", "blue")
-            //     .attr("cx", dX).attr("cy", dY);
-            //   grid.append("circle").attr("r", 2).attr("fill", "red")
-            //     .attr("cx", stX).attr("cy", stY);
-            //   grid.append("circle").attr("r", 2).attr("fill", "yellow")
-            //     .attr("cx", enX).attr("cy", enY);
-            // };
           }
         });
         let river = defs.append("path").attr("d", line(riverAmended));
@@ -505,8 +469,6 @@ function drawRiverLines(riversCount) {
             path[segmentCounter].values[4] +
             "," +
             path[segmentCounter].values[5];
-          // grid.append("circle").attr("r", 0.1).attr("fill", "red")
-          //   .attr("cx", sX).attr("cy", sY);
           let from = findClosestWithRadius(sX, sY, 0.1);
           if (from) {
             flux = polygons[from].flux / 30;

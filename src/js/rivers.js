@@ -1,3 +1,10 @@
+const WindDirection = {
+  North: "North",
+  East: "East",
+  South: "South",
+  West: "West",
+};
+
 // Calculate precipitation
 function calculatePrecipitation() {
   console.time("calculatePrecipitation");
@@ -25,124 +32,21 @@ function calculatePrecipitation() {
   }
   let precipitationInit = precipitationInput.value / Math.sqrt(sides);
   let selection = 10 / sides;
+
   if (north.checked) {
-    let frontier = polygons.filter(
-      (polygon) =>
-        polygon.point.y < selection &&
-        polygon.point.x > mapWidth * 0.1 &&
-        polygon.point.x < mapWidth * 0.9
-    );
-    frontier.map((polygon) => {
-      let x = polygon.point.x;
-      let y = polygon.point.y;
-      let precipitation = precipitationInit;
-      while (y < mapHeight && precipitation > 0) {
-        y += 5;
-        x += Math.random() * 10 - 5;
-        let nearest = delaunay.find(x, y);
-        let height = polygons[nearest].height;
-        if (height >= 0.2) {
-          if (height < 0.6) {
-            let rain = Math.random() * height;
-            precipitation -= rain;
-            polygons[nearest].precipitation += rain;
-          } else {
-            precipitation = 0;
-            polygons[nearest].precipitation += precipitation;
-          }
-        }
-      }
-    });
+    calculatePrecipitationWithWind(WindDirection.North);
   }
   if (east.checked) {
-    let frontier = polygons.filter(
-      (polygon) =>
-        polygon.point.x > mapWidth - selection &&
-        polygon.point.y > mapHeight * 0.1 &&
-        polygon.point.y < mapHeight * 0.9
-    );
-    frontier.map((polygon) => {
-      let x = polygon.point.x;
-      let y = polygon.point.y;
-      let precipitation = precipitationInit;
-      while (x > 0 && precipitation > 0) {
-        x -= 5;
-        y += Math.random() * 10 - 5;
-        let nearest = delaunay.find(x, y);
-        let height = polygons[nearest].height;
-        if (height >= 0.2) {
-          if (height < 0.6) {
-            let rain = Math.random() * height;
-            precipitation -= rain;
-            polygons[nearest].precipitation += rain;
-          } else {
-            precipitation = 0;
-            polygons[nearest].precipitation += precipitation;
-          }
-        }
-      }
-    });
+    calculatePrecipitationWithWind(WindDirection.East);
   }
   if (south.checked) {
-    let frontier = polygons.filter(
-      (polygon) =>
-        polygon.point.y > mapHeight - selection &&
-        polygon.point.x > mapWidth * 0.1 &&
-        polygon.point.x < mapWidth * 0.9
-    );
-    frontier.map((polygon) => {
-      let x = polygon.point.x;
-      let y = polygon.point.y;
-      let precipitation = precipitationInit;
-      while (y > 0 && precipitation > 0) {
-        y -= 5;
-        x += Math.random() * 10 - 5;
-        let nearest = delaunay.find(x, y);
-        let height = polygons[nearest].height;
-        if (height >= 0.2) {
-          if (height < 0.6) {
-            let rain = Math.random() * height;
-            precipitation -= rain;
-            polygons[nearest].precipitation += rain;
-          } else {
-            precipitation = 0;
-            polygons[nearest].precipitation += precipitation;
-          }
-        }
-      }
-    });
+    calculatePrecipitationWithWind(WindDirection.South);
   }
   if (west.checked) {
-    let frontier = polygons.filter(
-      (polygon) =>
-        polygon.point.x < selection &&
-        polygon.point.y > mapHeight * 0.1 &&
-        polygon.point.y < mapHeight * 0.9
-    );
-    frontier.map((polygon) => {
-      let x = polygon.point.x;
-      let y = polygon.point.y;
-      let precipitation = precipitationInit;
-      while (x < mapWidth && precipitation > 0) {
-        x += 5;
-        y += Math.random() * 20 - 10;
-        let nearest = delaunay.find(x, y);
-        let height = polygons[nearest].height;
-        if (height >= 0.2) {
-          if (height < 0.6) {
-            let rain = Math.random() * height;
-            precipitation -= rain;
-            polygons[nearest].precipitation += rain;
-          } else {
-            precipitation = 0;
-            polygons[nearest].precipitation += precipitation;
-          }
-        }
-      }
-    });
+    calculatePrecipitationWithWind(WindDirection.West);
   }
   // Smooth precipitation by taking average values of all neighbors
-  polygons.map((polygon) => {
+  polygons.forEach((polygon) => {
     if (polygon.height >= 0.2) {
       let nearbyPrecipitation = [polygon.precipitation];
       for (let neighbor of voronoi.neighbors(polygon.index)) {
@@ -154,6 +58,74 @@ function calculatePrecipitation() {
     }
   });
   console.timeEnd("calculatePrecipitation");
+
+  function calculatePrecipitationWithWind(wind) {
+    let frontier = polygons.filter((polygon) => {
+      if (wind === WindDirection.North) {
+        return (
+          polygon.point.y < selection &&
+          polygon.point.x > mapWidth * 0.1 &&
+          polygon.point.x < mapWidth * 0.9
+        );
+      } else if (wind === WindDirection.East) {
+        return (
+          polygon.point.x > mapWidth - selection &&
+          polygon.point.y > mapHeight * 0.1 &&
+          polygon.point.y < mapHeight * 0.9
+        );
+      } else if (wind === WindDirection.South) {
+        return (
+          polygon.point.y > mapHeight - selection &&
+          polygon.point.x > mapWidth * 0.1 &&
+          polygon.point.x < mapWidth * 0.9
+        );
+      } else {
+        return (
+          polygon.point.x < selection &&
+          polygon.point.y > mapHeight * 0.1 &&
+          polygon.point.y < mapHeight * 0.9
+        );
+      }
+    });
+    frontier.forEach((polygon) => {
+      let x = polygon.point.x;
+      let y = polygon.point.y;
+      let precipitation = precipitationInit;
+      let condition = 0;
+      while (
+        (wind === WindDirection.North && y < mapHeight) ||
+        (wind === WindDirection.East && x > 0) ||
+        (wind === WindDirection.South && y > 0) ||
+        (wind === WindDirection.West && x < mapWidth && precipitation > 0)
+      ) {
+        if (wind === WindDirection.North) {
+          y += 5;
+          x += Math.random() * 10 - 5;
+        } else if (wind === WindDirection.East) {
+          x -= 5;
+          y += Math.random() * 10 - 5;
+        } else if (wind === WindDirection.South) {
+          y -= 5;
+          x += Math.random() * 10 - 5;
+        } else {
+          x += 5;
+          y += Math.random() * 10 - 5;
+        }
+        let nearest = delaunay.find(x, y);
+        let height = polygons[nearest].height;
+        if (height >= 0.2) {
+          if (height < 0.6) {
+            let rain = Math.random() * height;
+            precipitation -= rain;
+            polygons[nearest].precipitation += rain;
+          } else {
+            precipitation = 0;
+            polygons[nearest].precipitation += precipitation;
+          }
+        }
+      }
+    });
+  }
 }
 
 // Flux
@@ -192,9 +164,6 @@ function flux() {
           y: polygon.point.y,
           type: "source",
         });
-        // Sources marked as red blobs
-        // grid.append("circle").attr("r", 5).attr("fill", "red")
-        //   .attr("cx", polygon.point.x).attr("cy", polygon.point.y);
       }
       // Assign existing river to the downhill cell
       if (!polygons[min].river) {

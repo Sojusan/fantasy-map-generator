@@ -269,7 +269,7 @@ function resolveDepressions() {
 function downCutCoastline() {
   console.time("downCutCoastline");
   let downCut = downCuttingInput.valueAsNumber;
-  polygons.map((polygon) => {
+  polygons.forEach((polygon) => {
     if (polygon.height >= 0.2) {
       polygon.height -= downCut;
     }
@@ -281,7 +281,7 @@ function downCutCoastline() {
 function downCutRivers() {
   console.time("downCutRivers");
   var downCut = downCuttingInput.valueAsNumber;
-  polygons.map((polygon) => {
+  polygons.forEach((polygon) => {
     if (polygon.flux >= 0.03 && polygon.height >= 0.21) {
       polygon.height -= downCut / 10;
     }
@@ -316,14 +316,14 @@ function viewboxClicked(event) {
       .attr("fill", mapColor(1 - heightInput.valueAsNumber))
       .attr("class", "circle");
     if ($(".circle").length == 1) {
-      add(nearest, "island");
+      add(nearest, TerrainType.Island);
       // Change options to defaults for hills
       heightInput.value = 0.2;
       heightOutput.value = 0.2;
       radiusInput.value = 0.99;
       radiusOutput.value = 0.99;
     } else {
-      add(nearest, "hill");
+      add(nearest, TerrainType.Hill);
       // Let's make height random for hills
       let height = (Math.random() * 0.4 + 0.1).toFixed(2);
       heightInput.value = height;

@@ -1,3 +1,8 @@
+const TerrainType = {
+  Island: "Island",
+  Hill: "Hill"
+};
+
 // Add new terrain blob
 function add(start, type) {
   // get options from inputs
@@ -13,7 +18,7 @@ function add(start, type) {
   used.push(start);
 
   for (let i = 0; i < queue.length && height > 0.01; i++) {
-    if (type == "island") {
+    if (type == TerrainType.Island) {
       height = polygons[queue[i]].height * radius;
     } else {
       height *= radius;

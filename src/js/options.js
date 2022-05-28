@@ -13,7 +13,7 @@ $("#blurInput").change(() => {
 // Toggle polygons strokes on input change
 $("#strokesInput").change(() => {
   if (strokesInput.checked == true) {
-    polygons.map((polygon) => {
+    polygons.forEach((polygon) => {
       grid
         .append("path")
         .attr("d", "M" + polygon.join("L") + "Z")
@@ -27,7 +27,7 @@ $("#strokesInput").change(() => {
 // Toggle precipitation map
 $("#fluxInput").change(() => {
   if (fluxInput.checked == true) {
-    polygons.map((polygon) => {
+    polygons.forEach((polygon) => {
       if (polygon.height >= 0.2) {
         grid
           .append("path")
@@ -45,7 +45,7 @@ $("#fluxInput").change(() => {
 // Toggle temperature map
 $("#temperatureInput").change(() => {
   if (temperatureInput.checked == true) {
-    polygons.map((polygon) => {
+    polygons.forEach((polygon) => {
       if (polygon.height >= 0.2) {
         grid
           .append("path")
@@ -63,7 +63,7 @@ $("#temperatureInput").change(() => {
 // Toggle biome map
 $("#biomeInput").change(() => {
   if (biomeInput.checked == true) {
-    polygons.map((polygon) => {
+    polygons.forEach((polygon) => {
       if (polygon.height >= 0.2) {
         grid
           .append("path")
@@ -81,7 +81,7 @@ $("#biomeInput").change(() => {
 // Toggle grayscale map
 $("#grayscaleInput").change(() => {
   if (grayscaleInput.checked == true) {
-    polygons.map((polygon) => {
+    polygons.forEach((polygon) => {
       grid
         .append("path")
         .attr("d", "M" + polygon.join("L") + "Z")

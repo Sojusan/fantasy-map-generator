@@ -28,7 +28,6 @@ function circumcenters_coords() {
       y: circumcenters[i + 1],
     });
   }
-
   return vertex_coords;
 }
 
@@ -37,7 +36,6 @@ function voronoi_vertex() {
   for (let i = 0; i < sites.length; i++) {
     let polygon = voronoi.cellPolygon(i);
     polygon.forEach((item) => {
-      // console.log(item)
       let is_unique = true;
       for (let j = 0; j < vertex_coords.length; j++) {
         if (item[0] === vertex_coords[j].x && item[1] === vertex_coords[j].y) {
@@ -53,7 +51,6 @@ function voronoi_vertex() {
       }
     });
   }
-
   return vertex_coords;
 }
 
@@ -63,7 +60,6 @@ d3.select("#relax-button").on("click", relax);
 
 // Adding relax function
 function relax() {
-  // relaxation itself
   // iterator increment
   iteration.value = +iteration.value + 1;
   // adjust every point
