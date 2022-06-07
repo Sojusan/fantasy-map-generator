@@ -1,8 +1,3 @@
-const CoastlineType = {
-  Island: "Island",
-  Lake: "Lake"
-};
-
 // Calculate map position on globe
 function calculateMapCoordinates() {
   const size = +document.getElementById("mapSizeOutput").value;
@@ -61,13 +56,13 @@ function drawMapBase() {
   mapCells.selectAll("path").remove();
   shallow.selectAll("path").remove();
   // Set background color for islands
-  if (mapStyle.value === "flat") {
+  if (mapStyle.value === MapStyle.Flat) {
     d3.selectAll(".islandBack").attr("fill", "#f9f9eb");
   } else {
     d3.selectAll(".islandBack").attr("fill", mapColor(0.78));
   }
   // "polygonal" map style
-  if (mapStyle.value === "polygonal") {
+  if (mapStyle.value === MapStyle.Polygonal) {
     polygons.map((polygon) => {
       mapCells
         .append("path")
@@ -83,7 +78,7 @@ function drawMapBase() {
   }
   // Hatching for shallow water
   polygons.map((polygon) => {
-    if (polygon.type === "shallow") {
+    if (polygon.type === PolygonType.Shallow) {
       shallow.append("path").attr("d", "M" + polygon.join("L") + "Z");
     }
   });
@@ -104,7 +99,7 @@ function markFeatures() {
   let start = delaunay.find(0, 0);
   queue.push(start);
   used.push(start);
-  let type = "Ocean";
+  let type = FeatureType.Ocean;
   let name = undefined;
   if (polygons[start].featureType) {
     name = polygons[start].featureName;
@@ -133,13 +128,13 @@ function markFeatures() {
   let unmarked = polygons.filter((polygon) => !polygon.featureType);
   while (unmarked.length > 0) {
     if (unmarked[0].height >= 0.2) {
-      type = "Island";
+      type = FeatureType.Island;
       number = island;
       island += 1;
       greater = 0.2;
       less = 100; // just to omit exclusion
     } else {
-      type = "Lake";
+      type = FeatureType.Lake;
       number = lake;
       lake += 1;
       greater = -100; // just to omit exclusion
@@ -195,12 +190,12 @@ function drawCoastline() {
           let start = edgePoints[0].join(" ");
           let end = edgePoints[1].join(" ");
           let type, number;
-          if (polygons[neighbor].featureType === "Ocean") {
-            polygons[neighbor].type = "shallow";
-            type = "Island";
+          if (polygons[neighbor].featureType === FeatureType.Ocean) {
+            polygons[neighbor].type = PolygonType.Shallow;
+            type = FeatureType.Island;
             number = polygon.featureNumber;
           } else {
-            type = "Lake";
+            type = FeatureType.Lake;
             number = polygons[neighbor].featureNumber;
           }
           line.push({ start, end, type, number });
@@ -279,8 +274,8 @@ function drawCoastline() {
     .y((point) => y(point.y))
     .curve(d3.curveBasisClosed);
   // Find and draw continuous coastline (island/ocean and lake/island)
-  findCoastline(CoastlineType.Island);
-  findCoastline(CoastlineType.Lake);
+  findCoastline(FeatureType.Island);
+  findCoastline(FeatureType.Lake);
   oceanLayer
     .append("rect")
     .attr("x", 0)
@@ -324,7 +319,7 @@ function drawCoastline() {
       }
       edgesOfFeature = line.filter((edge) => edge.type == type && edge.number === number);
       number += 1;
-      if (type === CoastlineType.Island) {
+      if (type === FeatureType.Island) {
         svg.select("#shape").append("path").attr("d", path(coast)).attr("fill", "black");
         islandBack.append("path").attr("d", path(coast));
         coastline.append("path").attr("d", path(coast));
@@ -490,7 +485,7 @@ function drawRiverLines(riversCount) {
             .attr("d", "M" + segment)
             .attr("stroke-width", riverWidth);
         }
-      } else if (dataRiver[1].type == "delta") {
+      } else if (dataRiver[1].type == RiverType.Delta) {
         riverAmended.push({ x: dataRiver[0].x, y: dataRiver[0].y });
         let middleX = (dataRiver[0].x + dataRiver[1].x) / 2 + (0.2 + Math.random() * 0.1);
         let middleY = (dataRiver[0].y + dataRiver[1].y) / 2 + (0.2 + Math.random() * 0.1);

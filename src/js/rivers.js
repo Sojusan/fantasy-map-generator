@@ -1,10 +1,3 @@
-const WindDirection = {
-  North: "North",
-  East: "East",
-  South: "South",
-  West: "West",
-};
-
 // Calculate precipitation
 function calculatePrecipitation() {
   console.time("calculatePrecipitation");
@@ -162,7 +155,7 @@ function flux() {
           cell: polygon.index,
           x: polygon.point.x,
           y: polygon.point.y,
-          type: "source",
+          type: RiverType.Source,
         });
       }
       // Assign existing river to the downhill cell
@@ -191,7 +184,7 @@ function flux() {
               cell: polygon.index,
               x: value.x,
               y: value.y,
-              type: "delta",
+              type: RiverType.Delta,
               pour: pour[0].cell,
             });
           } else {
@@ -200,14 +193,14 @@ function flux() {
               cell: polygon.index,
               x: polygon.point.x,
               y: polygon.point.y,
-              type: "course",
+              type: RiverType.Course,
             });
             riversData.push({
               river: riverNext,
               cell: polygon.index,
               x: value.x,
               y: value.y,
-              type: "delta",
+              type: RiverType.Delta,
               pour: pour[0].cell,
             });
           }
@@ -220,7 +213,7 @@ function flux() {
           cell: polygon.index,
           x: pour[0].x + (pour[0].x - polygon.point.x) / 10,
           y: pour[0].y + (pour[0].y - polygon.point.y) / 10,
-          type: "estuary",
+          type: RiverType.Estuary,
           pour: pour[0].cell,
         });
       }
@@ -231,7 +224,7 @@ function flux() {
         cell: min,
         x: polygons[min].point.x,
         y: polygons[min].point.y,
-        type: "course",
+        type: RiverType.Course,
       });
     }
   });

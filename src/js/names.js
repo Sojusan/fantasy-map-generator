@@ -1,5 +1,5 @@
 // Array to use as names
-let adjectives = [
+const adjectives = [
   "Ablaze",
   "Ablazing",
   "Accented",

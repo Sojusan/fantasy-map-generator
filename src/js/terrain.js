@@ -1,8 +1,3 @@
-const TerrainType = {
-  Island: "Island",
-  Hill: "Hill"
-};
-
 // Add new terrain blob
 function add(start, type) {
   // get options from inputs
