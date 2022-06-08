@@ -85,10 +85,10 @@ function calculatePrecipitation() {
       let y = polygon.point.y;
       let precipitation = precipitationInit;
       while (
-        (wind === WindDirection.North && y < mapHeight) ||
+        ((wind === WindDirection.North && y < mapHeight) ||
         (wind === WindDirection.East && x > 0) ||
         (wind === WindDirection.South && y > 0) ||
-        (wind === WindDirection.West && x < mapWidth && precipitation > 0)
+        (wind === WindDirection.West && x < mapWidth)) && precipitation > 0
       ) {
         if (wind === WindDirection.North) {
           y += 5;
@@ -111,8 +111,8 @@ function calculatePrecipitation() {
             precipitation -= rain;
             polygons[nearest].precipitation += rain;
           } else {
-            precipitation = 0;
             polygons[nearest].precipitation += precipitation;
+            precipitation = 0;
           }
         }
       }
