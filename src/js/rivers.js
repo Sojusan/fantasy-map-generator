@@ -84,7 +84,6 @@ function calculatePrecipitation() {
       let x = polygon.point.x;
       let y = polygon.point.y;
       let precipitation = precipitationInit;
-      let condition = 0;
       while (
         (wind === WindDirection.North && y < mapHeight) ||
         (wind === WindDirection.East && x > 0) ||
