@@ -1,5 +1,6 @@
 // Calculate map position on globe
 function calculateMapCoordinates() {
+  console.time("calculateMapCoordinates");
   const size = +document.getElementById("mapSizeOutput").value;
   const latitudeShift = +document.getElementById("latitudeOutput").value;
 
@@ -16,6 +17,7 @@ function calculateMapCoordinates() {
     longitudeW: -longitude,
     longitudeE: longitude,
   };
+  console.timeEnd("calculateMapCoordinates");
 }
 
 // Temperature calculations
@@ -334,6 +336,26 @@ function drawCoastline() {
 // Create random map
 function randomMap(count) {
   console.time("randomMap");
+  createTerrain(count);
+  downCutCoastline();
+  calculateMapCoordinates();
+  calculateTemperature();
+  calculatePrecipitation();
+  loadDefaultBiomeSettings();
+  createBiomesColorsTable();
+  createBiomesMatrixTable();
+  assignBiomes();
+  resolveDepressions();
+  downCutRivers();
+  markFeatures();
+  drawCoastline();
+  drawMapBase();
+  $(".circles").hide();
+  console.timeEnd("randomMap");
+}
+
+function createTerrain(count) {
+  console.time("createTerrain");
   let rnd;
   for (let counter = 0; counter < count; counter++) {
     // Big blob first
@@ -378,22 +400,7 @@ function randomMap(count) {
   }
   heightInput.value = Math.random() * 0.4 + 0.1;
   heightOutput.value = heightInput.valueAsNumber;
-  // Process the calculations
-  downCutCoastline();
-  calculateMapCoordinates();
-  calculateTemperature();
-  calculatePrecipitation();
-  loadDefaultBiomeSettings();
-  createBiomesColorsTable();
-  createBiomesMatrixTable();
-  assignBiomes();
-  resolveDepressions();
-  downCutRivers();
-  markFeatures();
-  drawCoastline();
-  drawMapBase();
-  $(".circles").hide();
-  console.timeEnd("randomMap");
+  console.timeEnd("createTerrain");
 }
 
 // Draw river lines

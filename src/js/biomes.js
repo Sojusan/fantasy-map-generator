@@ -10,6 +10,7 @@ document.getElementById("biome_polygons_chart_button").addEventListener("click",
  * Load default settings for biomes.
  */
 function loadDefaultBiomeSettings() {
+  console.time("loadDefaultBiomeSettings");
   // This array contains all the biomes
   biomesArray = [
     { name: "None", color: "#ffffff" },
@@ -44,6 +45,7 @@ function loadDefaultBiomeSettings() {
   precipitationLimitsArray = [0.16, 0.33, 0.5, 0.66, 0.83];
   // Limits used to calculate the column in `biomesMatrix`
   temperatureLimitsArray = [-10, 0, 10, 20, 30];
+  console.timeEnd("loadDefaultBiomeSettings");
 }
 
 /**
@@ -68,6 +70,7 @@ function createTableHeader(headerDataArray) {
  * Create a table in the HTML document, based on the values in `biomesArray`.
  */
 function createBiomesColorsTable() {
+  console.time("createBiomesColorsTable");
   let biomesColorsTable = document.querySelector("#biomes_colors_table");
   if (biomesColorsTable.hasChildNodes()) {
     biomesColorsTable.removeChild(biomesColorsTable.lastChild);
@@ -96,6 +99,7 @@ function createBiomesColorsTable() {
   });
   table.appendChild(tbody);
   biomesColorsTable.appendChild(table);
+  console.timeEnd("createBiomesColorsTable");
 }
 
 /**
@@ -136,6 +140,7 @@ function getVerticalHeaderValuesArray(valuesArray) {
  * Create a table in the HTML document, based on the values in `biomesMatrix`.
  */
 function createBiomesMatrixTable() {
+  console.time("createBiomesMatrixTable");
   let biomesMatrixTable = document.querySelector("#biomes_matrix_table");
   if (biomesMatrixTable.hasChildNodes()) {
     biomesMatrixTable.removeChild(biomesMatrixTable.lastChild);
@@ -174,6 +179,7 @@ function createBiomesMatrixTable() {
   table.appendChild(thead);
   table.appendChild(tbody);
   biomesMatrixTable.appendChild(table);
+  console.timeEnd("createBiomesMatrixTable");
 }
 
 /**
